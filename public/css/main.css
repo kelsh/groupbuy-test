@@ -1,0 +1,7 @@
+body {
+  background-color: yellow;
+}
+body div,
+body p {
+  color: pink;
+}
