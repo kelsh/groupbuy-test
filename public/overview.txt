@@ -1,0 +1,30 @@
+client side
+------------
+
+Document loads ->
+socket.io connects ->
+client asks for queue number ->
+audio tag src set by queue number ->
+audio finishes loading ->
+client requests ping test ->
+progress bar for incoming pings ->
+ping test completes and client analyzes ->
+client shows end result of analysis ->
+client requests time and subtracts offset ->
+client plays time - offset
+
+server side
+----------
+
+Client connects and asks for queue number ->
+client requests audio (iterate through audio files) ->
+client requests ping test ->
+client id sent to queue ->
+client requests time, send time ->
+(if clients = 1, start counting time, if clients = 0, remove interval and set time to 0)
+
+queue
+--------
+while there are unprocessed IDs, iterate through clients->
+on 0+1 unprocessed, run pingtest to unprocessed clientID ->
+pingTest complete, pingtest next unprocessedID ->

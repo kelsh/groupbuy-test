@@ -1,7 +1,35 @@
 body {
   background-color: yellow;
+  font-family: 'Roboto Slab', serif;
 }
 body div,
 body p {
-  color: pink;
+  color: blue;
+}
+body #play-button {
+  font-size: 46px;
+}
+body div {
+  z-index: 2;
+}
+body div #start {
+  display: block;
+  font-size: 160px;
+}
+body .progress-bar {
+  width: 600px;
+  font-size: 24px;
+  color: orange;
+}
+body span#wow {
+  font-size: 150px;
+  height: 600px;
+  width: 400px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+body #progress-bar-offset {
+  border: 1px solid blue;
 }

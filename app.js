@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var connect = require('./routes/connect');
 
 var app = express();
 
@@ -23,18 +23,20 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/connect', connect);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handlers
@@ -42,23 +44,23 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
     });
-  });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
 });
 var debug = require('debug')('groupbuy:server');
 var http = require('http');
@@ -89,19 +91,19 @@ server.on('listening', onListening);
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+    var port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+    if (port >= 0) {
+        // port number
+        return port;
+    }
 
-  return false;
+    return false;
 }
 
 /**
@@ -109,27 +111,25 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+    var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
 }
 
 /**
@@ -137,12 +137,69 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+    var addr = server.address();
+    var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+    debug('Listening on ' + bind);
 }
+
+
+//socket io stuff
+var fs = require('fs');
+var io = require('socket.io')(server);
+var n = 0;
+
+function ping() {
+    return new Date().getTime() - n;
+}
+
+var interval;
+var timeSet = false;
+io.on('connection', function(socket) {
+
+
+    socket.emit('queue', {
+        'users': io.engine.clientsCount
+    });
+    socket.on('pingMe', function() {
+        if (timeSet === false) {
+            n = new Date().getTime();
+            timeSet = true;
+        }
+        socket.emit('ping', {
+            'time': ping()
+        });
+    });
+
+    socket.pingTestCount = 0;
+    socket.on('pingTestMe', function(d) {
+        if (socket.pingTestCount > 99) {
+            console.log('pingTestOver');
+            socket.emit('pingTestOver', {});
+            socket.pingTestCount = 0;
+        } else {
+            setTimeout(function() {
+                    var o = new Date().getTime();
+                    socket.emit('pingTest', {
+                        'time': o,
+                        'offset': o - d['time'] - 80
+                    });
+                    socket.pingTestCount++;
+                
+            }, 80);
+        }
+    });
+
+    socket.on('disconnect', function() {
+
+        if (io.engine.clientsCount === 0) {
+            n = 0;
+            timeSet = false;
+        }
+    });
+});
+
+
+
 
 
 module.exports = app;

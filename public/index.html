@@ -1,0 +1,56 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.3.7.js">
+    </script>
+    <script src="/js/progressbar.js">
+    </script>
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+    <script>
+   
+    // get a file based on queue number
+    // $(html5 audio).src = local/queue/1
+
+
+
+    //figure out offset
+    //offset = (server time - previous server time) - 100
+    /* {
+		time: 102983021983,  //what the server time is
+		number: 0 //which ping this is
+    }
+    */
+    //being ping test -> recieve 100 pings, store them in array
+    // take array and iterate over it, starting at the second and minusing the previous and 200ms
+    //offset arary holds the offsets for later calcs
+    </script>
+</head>
+
+<body>
+	<div id="play-button">
+	Lol, mobile can't autoplay click this button to start it up:
+	<button id="start">CLICK ME</button>
+	</div>
+    <audio oncanplaythrough='audioReady()' id="player"  controls>
+        <source  type="audio/mp3"> Your browser does not support the audio element.
+    </audio>
+    <div class="progress-bar">
+    	Measuring Network latency.
+        <div id="progress-bar-offset">
+        </div>
+        Calculating Offset.
+        <div>
+        <p>Confidence : not implimented</p>
+        <p>Offset from server:<span id="offset"></span></p>
+        </div>
+    </div>
+    <span id='wow'>This is a Test</span>
+    <script src="/js/main.js">
+    </script>
+  
+</body>
+
+</html>
